@@ -4,12 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>龜馬山紫皇天乙真慶宮 中元法會牌位查詢</title>
+    <!-- 引入 Tailwind CSS CDN，用於快速美化頁面 -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* 自訂字體，確保中文顯示良好 */
         body {
             font-family: 'Inter', 'Noto Sans TC', sans-serif; /* 優先使用 Inter (英文) 和 Noto Sans TC (中文) */
-            background-color: #f8fafc; /* 淺藍灰色背景 */
+            background-color: #f6deb9; /* 頁面整體背景顏色 */
         }
         /* 表格樣式調整，確保姓名只出現一次的顯示效果 */
         .result-table td {
@@ -25,19 +26,45 @@
             text-align: left;
             border: 1px solid #cbd5e1; /* 表頭邊框稍深 */
         }
+        /* 自定義 H1 顏色 */
+        .h1-custom-color {
+            color: #4e167d; /* H1 標題顏色 */
+        }
+        /* 自定義統計數字顏色 */
+        .count-color {
+            color: #4e167d; /* 統計數字的顏色 */
+        }
     </style>
 </head>
 <body class="p-4 sm:p-8 flex flex-col items-center min-h-screen">
 
     <div class="container mx-auto max-w-4xl bg-white shadow-lg rounded-xl p-6 sm:p-10 mb-8">
-        <h1 class="text-3xl sm:text-4xl font-bold text-center text-indigo-800 mb-6">
-            龜馬山紫皇天乙真慶宮 <br class="sm:hidden">中元法會牌位查詢
+        <!-- 主標題 H1 -->
+        <h1 class="text-3xl sm:text-4xl font-bold text-center h1-custom-color mb-2">
+            龜馬山紫皇天乙真慶宮
         </h1>
+        <!-- 新增的 H2 副標題，黑色文字 -->
+        <h2 class="text-2xl sm:text-3xl font-bold text-center text-black mb-6">
+            中元法會牌位查詢
+        </h2>
 
+        <!-- 法會牌位統計區塊 (背景色為淺藍色，標題顏色已調整為與查詢區塊一致) -->
+        <div class="p-6 bg-blue-50 rounded-lg shadow-inner mb-8">
+            <h2 class="text-2xl font-semibold text-indigo-700 mb-4 text-center">法會牌位統計表</h2> <!-- 標題文字改為 text-indigo-700 -->
+            <div id="statisticsDisplay" class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-lg text-black"> <!-- 統計文字為黑色 -->
+                <!-- 統計資料將由 JavaScript 動態插入到這裡 -->
+                <p><span class="inline-block w-32"><strong class="text-black">超拔祖先：</strong></span> <span id="ancestorCount" class="count-color">0</span>份 牌位</p> 
+                <p><span class="inline-block w-32"><strong class="text-black">冤親債主：</strong></span> <span id="debtorCount" class="count-color">0</span>份 牌位</p> 
+                <p><span class="inline-block w-32"><strong class="text-black">地基主：</strong></span> <span id="landlordCount" class="count-color">0</span>份 牌位</p> 
+                <p><span class="inline-block w-32"><strong class="text-black">超拔嬰靈：</strong></span> <span id="infantCount" class="count-color">0</span>份 牌位</p> 
+            </div>
+        </div>
+
+        <!-- 查詢區塊 (修改為單一輸入框) -->
         <div class="mb-8 p-6 bg-indigo-50 rounded-lg shadow-inner">
             <h2 class="text-2xl font-semibold text-indigo-700 mb-4 text-center">牌位查詢</h2>
             <div class="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-4">
-                <input type="text" id="nameInput" placeholder="請輸入姓名"
+                <input type="text" id="queryInput" placeholder="請輸入姓名或公司名稱" 
                        class="w-full sm:w-auto flex-grow p-3 border border-indigo-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-lg">
                 <button id="queryButton"
                         class="w-full sm:w-auto px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition duration-300 ease-in-out transform hover:scale-105">
@@ -47,6 +74,7 @@
             <div id="errorMessage" class="text-red-600 text-center mt-4 text-sm hidden"></div>
         </div>
 
+        <!-- 查詢結果區塊 (已移除公司名稱欄位) -->
         <div id="resultsSection" class="mb-8 hidden">
             <h2 class="text-2xl font-semibold text-indigo-700 mb-4 text-center">查詢結果</h2>
             <div class="overflow-x-auto rounded-lg shadow-md">
@@ -56,31 +84,23 @@
                             <th class="py-3 px-4 text-left text-sm font-medium text-gray-700 uppercase tracking-wider">姓名</th>
                             <th class="py-3 px-4 text-left text-sm font-medium text-gray-700 uppercase tracking-wider">牌位號</th>
                             <th class="py-3 px-4 text-left text-sm font-medium text-gray-700 uppercase tracking-wider">牌位種類</th>
+                            <!-- 移除公司名稱欄位 <th class="py-3 px-4 text-left text-sm font-medium text-gray-700 uppercase tracking-wider">公司名稱</th> -->
                         </tr>
                     </thead>
                     <tbody id="resultsTableBody" class="divide-y divide-gray-200">
-                        </tbody>
+                        <!-- 查詢結果將由 JavaScript 動態插入到這裡 -->
+                    </tbody>
                 </table>
-            </div>
-        </div>
-
-        <div class="p-6 bg-green-50 rounded-lg shadow-inner">
-            <h2 class="text-2xl font-semibold text-green-700 mb-4 text-center">法會牌位統計表</h2>
-            <div id="statisticsDisplay" class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-lg text-gray-800">
-                <p><strong class="text-green-800">超拔祖先：</strong> <span id="ancestorCount">0</span> 份牌位</p>
-                <p><strong class="text-green-800">冤親債主：</strong> <span id="debtorCount">0</span> 份牌位</p>
-                <p><strong class="text-green-800">地基主：</strong> <span id="landlordCount">0</span> 份牌位</p>
-                <p><strong class="text-green-800">超拔嬰靈：</strong> <span id="infantCount">0</span> 份牌位</p>
             </div>
         </div>
     </div>
 
     <script>
-        // !!! 請將這裡的 'YOUR_APPS_SCRIPT_WEB_APP_URL' 替換成您在第二部分部署後取得的 Google Apps Script 網路應用程式網址 !!!
-        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxLrXwagFCIXSUleo_e3E0bPmwmgd6wQB2kcdFCtFd0Iy4FrLd_CMY2eAoMItoyR372/exec'; 
+        // 您的 Google Apps Script 網路應用程式網址 (已自動填入)
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxsNvPSRxh8zua1MCfX2dA9T9YU_rpX1LuDoZBPfSj5IPBCgFGOe45PkmufaEJ8P0LX/exec'; 
 
         // 獲取網頁上的各個元素
-        const nameInput = document.getElementById('nameInput');
+        const queryInput = document.getElementById('queryInput'); // 獲取單一查詢輸入框
         const queryButton = document.getElementById('queryButton');
         const resultsSection = document.getElementById('resultsSection');
         const resultsTableBody = document.getElementById('resultsTableBody');
@@ -114,7 +134,7 @@
         function showLoading() {
             queryButton.textContent = '查詢中...'; // 按鈕顯示載入文字
             queryButton.disabled = true; // 禁用按鈕
-            nameInput.disabled = true; // 禁用輸入框
+            queryInput.disabled = true; // 禁用查詢輸入框
             hideError(); // 隱藏任何之前的錯誤訊息
             resultsSection.classList.add('hidden'); // 查詢前先隱藏結果區塊
             resultsTableBody.innerHTML = ''; // 清空舊的查詢結果
@@ -126,25 +146,32 @@
         function hideLoading() {
             queryButton.textContent = '查詢'; // 恢復按鈕文字
             queryButton.disabled = false; // 啟用按鈕
-            nameInput.disabled = false; // 啟用輸入框
+            queryInput.disabled = false; // 啟用查詢輸入框
         }
 
         /**
          * 從 Google Apps Script 獲取資料。
-         * @param {string} name - 要查詢的姓名 (如果為空，則只獲取統計資料)。
+         * @param {string} query - 要查詢的姓名或公司名稱 (可選)。
          */
-        async function fetchData(name = '') {
+        async function fetchData(query = '') {
             showLoading(); // 顯示載入狀態
             let url = APPS_SCRIPT_URL;
-            // 如果有提供姓名，則將姓名作為查詢參數加入 URL
-            if (name) {
-                url += `?name=${encodeURIComponent(name)}`; // encodeURIComponent 確保中文姓名能正確傳遞
+            const params = new URLSearchParams();
+
+            if (query) {
+                params.append('query', query); // 現在只傳遞一個 'query' 參數
+            }
+
+            if (params.toString()) { // 如果有任何參數，才添加到 URL
+                url += `?${params.toString()}`;
             }
 
             try {
                 const response = await fetch(url); // 發送請求到 Apps Script
                 if (!response.ok) { // 檢查 HTTP 請求是否成功
-                    throw new Error(`HTTP 錯誤！狀態碼：${response.status}`);
+                    // 如果不是 2xx 狀態碼，拋出錯誤
+                    const errorText = await response.text(); // 嘗試獲取錯誤響應的文本
+                    throw new Error(`HTTP 錯誤！狀態碼：${response.status} ${response.statusText || ''} - ${errorText}`);
                 }
                 const data = await response.json(); // 解析 JSON 回應
                 console.log('從 Apps Script 收到資料:', data); // 調試用，可以在瀏覽器開發者工具的 Console 中看到
@@ -157,7 +184,8 @@
 
             } catch (error) {
                 console.error('獲取資料時發生錯誤:', error);
-                showError('無法獲取資料，請確認網路連線或 Apps Script 設定是否正確。');
+                // 顯示更詳細的錯誤訊息給用戶
+                showError(`無法獲取資料，請確認網路連線或 Apps Script 設定是否正確。錯誤詳情：${error.message}`);
             } finally {
                 hideLoading(); // 無論成功失敗都隱藏載入狀態
             }
@@ -188,14 +216,15 @@
                         <td class="py-2 px-4">${nameCellContent}</td>
                         <td class="py-2 px-4">${record['半形牌位號']}</td>
                         <td class="py-2 px-4">${record['牌位種類']}</td>
+                        <!-- 不再顯示公司名稱欄位 <td>${record['公司名稱']}</td> -->
                     `;
                     resultsTableBody.appendChild(row); // 將行添加到表格主體
                 });
             } else {
                 resultsSection.classList.add('hidden'); // 如果沒有結果，則隱藏結果區塊
-                // 只有當使用者有輸入姓名但卻查無資料時，才顯示「查無資料」訊息
-                if (nameInput.value.trim() !== '') { 
-                    showError('查無此姓名牌位資料。請檢查輸入是否正確。');
+                // 只有當使用者有輸入查詢文字但卻查無資料時，才顯示無結果訊息
+                if (queryInput.value.trim() !== '') { 
+                    showError('查無此姓名或公司名稱的牌位資料。請檢查輸入是否正確。');
                 }
             }
         }
@@ -209,7 +238,7 @@
                 ancestorCount.textContent = stats['超拔祖先'] || 0; // 如果值為空則顯示 0
                 debtorCount.textContent = stats['冤親債主'] || 0;
                 landlordCount.textContent = stats['地基主'] || 0;
-                infantCount.textContent = stats['超拔嬰靈'] || 0;
+                infantCount.textContent = stats['超拔嬰靈'] || 0; 
             }
         }
 
@@ -217,12 +246,16 @@
 
         // 當點擊查詢按鈕時
         queryButton.addEventListener('click', () => {
-            const name = nameInput.value.trim(); // 獲取輸入框中的姓名並去除前後空白
-            fetchData(name); // 呼叫獲取資料函數
+            const queryText = queryInput.value.trim(); // 獲取單一查詢輸入框的值
+            if (queryText === '') {
+                showError('請輸入姓名或公司名稱進行查詢。');
+                return; // 如果為空，則不發送請求
+            }
+            fetchData(queryText); // 呼叫獲取資料函數，傳遞單一參數
         });
 
-        // 當在姓名輸入框中按下 Enter 鍵時，也觸發查詢
-        nameInput.addEventListener('keypress', (event) => {
+        // 當在查詢輸入框中按下 Enter 鍵時，也觸發查詢
+        queryInput.addEventListener('keypress', (event) => {
             if (event.key === 'Enter') {
                 queryButton.click(); // 模擬點擊查詢按鈕
             }
@@ -230,7 +263,7 @@
 
         // 當頁面載入完成時，自動執行一次 fetchData() 獲取並顯示統計資料
         document.addEventListener('DOMContentLoaded', () => {
-            fetchData(); // 不帶姓名參數，只獲取統計資料 (因為不需要查詢，只需統計)
+            fetchData(); // 不帶查詢參數，只獲取統計資料
         });
     </script>
 </body>
