@@ -4,172 +4,234 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>龜馬山紫皇天乙真慶宮 中元法會牌位查詢</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
+        /* 自訂字體，確保中文顯示良好 */
         body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            background-color: #f4f4f4;
-            color: #333;
+            font-family: 'Inter', 'Noto Sans TC', sans-serif; /* 優先使用 Inter (英文) 和 Noto Sans TC (中文) */
+            background-color: #f8fafc; /* 淺藍灰色背景 */
         }
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            background-color: #fff;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        /* 表格樣式調整，確保姓名只出現一次的顯示效果 */
+        .result-table td {
+            padding: 8px;
+            border: 1px solid #e2e8f0; /* 淺灰色邊框 */
         }
-        h1 {
-            color: #4e167d;
-            margin-bottom: 40px;
-        }
-        .search-box {
-            display: flex;
-            margin-bottom: 20px;
-        }
-        input[type="text"] {
-            flex-grow: 1;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px 0 0 4px;
-            font-size: 16px;
-            outline: none;
-        }
-        button {
-            padding: 10px 20px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 0 4px 4px 0;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background-color 0.3s ease;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-        #results {
-            margin-top: 20px;
-            border-top: 1px solid #eee;
-            padding-top: 20px;
-        }
-        .result-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-        }
-        .result-table th, .result-table td {
-            border: 1px solid #ddd;
-            padding: 10px;
-            text-align: left;
+        .result-table tr:nth-child(even) {
+            background-color: #f1f5f9; /* 偶數行使用淺色背景，方便閱讀 */
         }
         .result-table th {
-            background-color: #e9ecef;
-            font-weight: bold;
-            color: #495057;
-        }
-        .no-data {
-            text-align: center;
-            color: #6c757d;
-            padding: 20px;
-        }
-        .error-message {
-            color: red;
-            text-align: center;
-            margin-top: 10px;
-        }
-        .loading-message {
-            text-align: center;
-            color: #007bff;
-            padding: 20px;
+            background-color: #e2e8f0; /* 表頭背景色 */
+            padding: 10px 8px;
+            text-align: left;
+            border: 1px solid #cbd5e1; /* 表頭邊框稍深 */
         }
     </style>
 </head>
-<body>
-    <div class="container">
-        <h1>龜馬山紫皇天乙真慶宮</h1>
-        <label>中元法會牌位查詢</label>
-        <div class="search-box">
-            <input type="text" id="nameInput" placeholder="請輸入姓名">
-            <button onclick="searchPaizi()">查詢</button>
+<body class="p-4 sm:p-8 flex flex-col items-center min-h-screen">
+
+    <div class="container mx-auto max-w-4xl bg-white shadow-lg rounded-xl p-6 sm:p-10 mb-8">
+        <h1 class="text-3xl sm:text-4xl font-bold text-center text-indigo-800 mb-6">
+            龜馬山紫皇天乙真慶宮 <br class="sm:hidden">中元法會牌位查詢
+        </h1>
+
+        <div class="mb-8 p-6 bg-indigo-50 rounded-lg shadow-inner">
+            <h2 class="text-2xl font-semibold text-indigo-700 mb-4 text-center">牌位查詢</h2>
+            <div class="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-4">
+                <input type="text" id="nameInput" placeholder="請輸入姓名"
+                       class="w-full sm:w-auto flex-grow p-3 border border-indigo-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-lg">
+                <button id="queryButton"
+                        class="w-full sm:w-auto px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition duration-300 ease-in-out transform hover:scale-105">
+                    查詢
+                </button>
+            </div>
+            <div id="errorMessage" class="text-red-600 text-center mt-4 text-sm hidden"></div>
         </div>
-        <div id="results">
+
+        <div id="resultsSection" class="mb-8 hidden">
+            <h2 class="text-2xl font-semibold text-indigo-700 mb-4 text-center">查詢結果</h2>
+            <div class="overflow-x-auto rounded-lg shadow-md">
+                <table class="min-w-full bg-white border-collapse result-table">
+                    <thead>
+                        <tr>
+                            <th class="py-3 px-4 text-left text-sm font-medium text-gray-700 uppercase tracking-wider">姓名</th>
+                            <th class="py-3 px-4 text-left text-sm font-medium text-gray-700 uppercase tracking-wider">牌位號</th>
+                            <th class="py-3 px-4 text-left text-sm font-medium text-gray-700 uppercase tracking-wider">牌位種類</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resultsTableBody" class="divide-y divide-gray-200">
+                        </tbody>
+                </table>
+            </div>
         </div>
-        <div id="errorMessage" class="error-message"></div>
+
+        <div class="p-6 bg-green-50 rounded-lg shadow-inner">
+            <h2 class="text-2xl font-semibold text-green-700 mb-4 text-center">法會牌位統計表</h2>
+            <div id="statisticsDisplay" class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-lg text-gray-800">
+                <p><strong class="text-green-800">超拔祖先：</strong> <span id="ancestorCount">0</span> 份牌位</p>
+                <p><strong class="text-green-800">冤親債主：</strong> <span id="debtorCount">0</span> 份牌位</p>
+                <p><strong class="text-green-800">地基主：</strong> <span id="landlordCount">0</span> 份牌位</p>
+                <p><strong class="text-green-800">超拔嬰靈：</strong> <span id="infantCount">0</span> 份牌位</p>
+            </div>
+        </div>
     </div>
 
     <script>
-        // *** 請將這裡的 YOUR_WEB_APP_URL 替換為您在步驟三複製的網路應用程式網址！ ***
-        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbz9xkJZSXlqawqw8un6zbxEcY7qDUZuc9QuoZUq-Gjio8I-UXioWphJfV66RqhFAwJv/exec';
+        // !!! 請將這裡的 'YOUR_APPS_SCRIPT_WEB_APP_URL' 替換成您在第二部分部署後取得的 Google Apps Script 網路應用程式網址 !!!
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxLrXwagFCIXSUleo_e3E0bPmwmgd6wQB2kcdFCtFd0Iy4FrLd_CMY2eAoMItoyR372/exec'; 
 
-        async function searchPaizi() {
-            const nameInput = document.getElementById('nameInput');
-            const resultsDiv = document.getElementById('results');
-            const errorMessageDiv = document.getElementById('errorMessage');
+        // 獲取網頁上的各個元素
+        const nameInput = document.getElementById('nameInput');
+        const queryButton = document.getElementById('queryButton');
+        const resultsSection = document.getElementById('resultsSection');
+        const resultsTableBody = document.getElementById('resultsTableBody');
+        const errorMessage = document.getElementById('errorMessage');
 
-            resultsDiv.innerHTML = ''; // 清空之前的結果
-            errorMessageDiv.innerHTML = ''; // 清空之前的錯誤訊息
+        const ancestorCount = document.getElementById('ancestorCount');
+        const debtorCount = document.getElementById('debtorCount');
+        const landlordCount = document.getElementById('landlordCount');
+        const infantCount = document.getElementById('infantCount');
 
-            const name = nameInput.value.trim(); // 取得輸入的姓名並去除前後空白
+        /**
+         * 顯示錯誤訊息。
+         * @param {string} message - 要顯示的錯誤訊息內容。
+         */
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.classList.remove('hidden'); // 顯示錯誤訊息
+        }
 
-            if (name === '') {
-                errorMessageDiv.innerHTML = '請輸入姓名才能查詢。';
-                return;
+        /**
+         * 隱藏錯誤訊息。
+         */
+        function hideError() {
+            errorMessage.classList.add('hidden'); // 隱藏錯誤訊息
+            errorMessage.textContent = ''; // 清空錯誤訊息內容
+        }
+
+        /**
+         * 顯示載入狀態，禁用輸入和按鈕，提示用戶正在處理。
+         */
+        function showLoading() {
+            queryButton.textContent = '查詢中...'; // 按鈕顯示載入文字
+            queryButton.disabled = true; // 禁用按鈕
+            nameInput.disabled = true; // 禁用輸入框
+            hideError(); // 隱藏任何之前的錯誤訊息
+            resultsSection.classList.add('hidden'); // 查詢前先隱藏結果區塊
+            resultsTableBody.innerHTML = ''; // 清空舊的查詢結果
+        }
+
+        /**
+         * 隱藏載入狀態，啟用輸入和按鈕。
+         */
+        function hideLoading() {
+            queryButton.textContent = '查詢'; // 恢復按鈕文字
+            queryButton.disabled = false; // 啟用按鈕
+            nameInput.disabled = false; // 啟用輸入框
+        }
+
+        /**
+         * 從 Google Apps Script 獲取資料。
+         * @param {string} name - 要查詢的姓名 (如果為空，則只獲取統計資料)。
+         */
+        async function fetchData(name = '') {
+            showLoading(); // 顯示載入狀態
+            let url = APPS_SCRIPT_URL;
+            // 如果有提供姓名，則將姓名作為查詢參數加入 URL
+            if (name) {
+                url += `?name=${encodeURIComponent(name)}`; // encodeURIComponent 確保中文姓名能正確傳遞
             }
-
-            // 顯示載入訊息
-            resultsDiv.innerHTML = '<div class="loading-message">查詢中，請稍候...</div>';
-
-            // 準備要發送給 Apps Script 的資料
-            const formData = new FormData();
-            formData.append('name', name);
 
             try {
-                const response = await fetch(WEB_APP_URL, {
-                    method: 'POST',
-                    body: formData
-                });
-
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                const response = await fetch(url); // 發送請求到 Apps Script
+                if (!response.ok) { // 檢查 HTTP 請求是否成功
+                    throw new Error(`HTTP 錯誤！狀態碼：${response.status}`);
                 }
+                const data = await response.json(); // 解析 JSON 回應
+                console.log('從 Apps Script 收到資料:', data); // 調試用，可以在瀏覽器開發者工具的 Console 中看到
 
-                const data = await response.json(); // 解析回傳的 JSON 資料
+                // 處理查詢結果並顯示在表格中
+                displayQueryResults(data.queryResults);
 
-                if (data.error) {
-                    resultsDiv.innerHTML = ''; // 清空載入訊息
-                    errorMessageDiv.innerHTML = data.error;
-                } else if (data.message) {
-                    resultsDiv.innerHTML = `<div class="no-data">${data.message}</div>`;
-                } else {
-                    // 處理並顯示查詢結果
-                    displayResults(data, name); // 將查詢的姓名傳遞給 displayResults
-                }
+                // 處理統計資料並顯示在統計區塊
+                displayStatistics(data.statistics);
 
             } catch (error) {
-                console.error('查詢失敗:', error);
-                resultsDiv.innerHTML = ''; // 清空載入訊息
-                errorMessageDiv.innerHTML = `查詢發生錯誤：${error.message}，請稍後再試。`;
+                console.error('獲取資料時發生錯誤:', error);
+                showError('無法獲取資料，請確認網路連線或 Apps Script 設定是否正確。');
+            } finally {
+                hideLoading(); // 無論成功失敗都隱藏載入狀態
             }
         }
 
-        function displayResults(data, queryName) {
-            const resultsDiv = document.getElementById('results');
-            let html = `<h3>${queryName} 的查詢結果：</h3>`; // 在表格上方顯示查詢的姓名
-            html += '<table class="result-table">';
-            html += '<thead><tr><th>牌位號</th><th>牌位種類</th></tr></thead>'; // 不再顯示姓名欄位
-            html += '<tbody>';
+        /**
+         * 顯示查詢結果到網頁表格中。
+         * @param {Array<Object>} results - 查詢到的牌位記錄陣列。
+         */
+        function displayQueryResults(results) {
+            resultsTableBody.innerHTML = ''; // 先清空表格內容
+            if (results && results.length > 0) {
+                resultsSection.classList.remove('hidden'); // 顯示結果區塊
+                let lastDisplayedName = null; // 用於追蹤上一個顯示的姓名，以便重複的姓名只顯示一次
 
-            data.forEach(row => {
-                html += '<tr>';
-                html += `<td>${row.paiziHao}</td>`;
-                html += `<td>${row.paiziType}</td>`;
-                html += '</tr>';
-            });
+                results.forEach(record => {
+                    const row = document.createElement('tr'); // 創建新的表格行
+                    let nameCellContent = '';
 
-            html += '</tbody></table>';
-            resultsDiv.innerHTML = html;
+                    // 判斷姓名是否需要顯示 (如果與上一筆記錄的姓名不同，則顯示)
+                    if (record['姓名'] !== lastDisplayedName) {
+                        nameCellContent = record['姓名'];
+                        lastDisplayedName = record['姓名'];
+                    }
+
+                    // 將資料插入到表格單元格中
+                    row.innerHTML = `
+                        <td class="py-2 px-4">${nameCellContent}</td>
+                        <td class="py-2 px-4">${record['半形牌位號']}</td>
+                        <td class="py-2 px-4">${record['牌位種類']}</td>
+                    `;
+                    resultsTableBody.appendChild(row); // 將行添加到表格主體
+                });
+            } else {
+                resultsSection.classList.add('hidden'); // 如果沒有結果，則隱藏結果區塊
+                // 只有當使用者有輸入姓名但卻查無資料時，才顯示「查無資料」訊息
+                if (nameInput.value.trim() !== '') { 
+                    showError('查無此姓名牌位資料。請檢查輸入是否正確。');
+                }
+            }
         }
+
+        /**
+         * 顯示法會牌位統計資料。
+         * @param {Object} stats - 包含各牌位種類數量的物件。
+         */
+        function displayStatistics(stats) {
+            if (stats) {
+                ancestorCount.textContent = stats['超拔祖先'] || 0; // 如果值為空則顯示 0
+                debtorCount.textContent = stats['冤親債主'] || 0;
+                landlordCount.textContent = stats['地基主'] || 0;
+                infantCount.textContent = stats['超拔嬰靈'] || 0;
+            }
+        }
+
+        // --- 事件監聽器 ---
+
+        // 當點擊查詢按鈕時
+        queryButton.addEventListener('click', () => {
+            const name = nameInput.value.trim(); // 獲取輸入框中的姓名並去除前後空白
+            fetchData(name); // 呼叫獲取資料函數
+        });
+
+        // 當在姓名輸入框中按下 Enter 鍵時，也觸發查詢
+        nameInput.addEventListener('keypress', (event) => {
+            if (event.key === 'Enter') {
+                queryButton.click(); // 模擬點擊查詢按鈕
+            }
+        });
+
+        // 當頁面載入完成時，自動執行一次 fetchData() 獲取並顯示統計資料
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchData(); // 不帶姓名參數，只獲取統計資料 (因為不需要查詢，只需統計)
+        });
     </script>
 </body>
 </html>
