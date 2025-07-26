@@ -8,34 +8,33 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     /* 自訂 CSS 樣式 */
-    html { /*   , body  確保 html 和 body 佔滿整個視窗 */
-      /* height: 100%; */
-      /* width: 100%; /* 明確設定寬度為 100% */
-      margin: auto;/*  0 */
+    html, body { /* 確保 html 和 body 佔滿整個視窗 */
+      height: 100%;
+      width: 100%; /* 明確設定寬度為 100% */
+      margin: 0;
       padding: 0;
     }
     body {
       font-family: 'Inter', sans-serif;
       background-color: #f6deb9; /* 淺黃色背景 */
       color: #333;
-      /* 使用 Flexbox 進行水平置中 */
-      display: flex;
-      justify-content: center; /* 水平居中 */
-      align-items: flex-start; /* 內容從頂部開始，不進行垂直居中 */
-      min-height: 100vh; /* 確保 body 至少佔滿一個視窗的高度 */
+      /* 移除 Flexbox 相關屬性，讓 body 保持為標準塊級元素 */
+      /* display: flex; */
+      /* justify-content: center; */
+      /* align-items: flex-start; */
+      /* min-height: 100vh; */
     }
-    .container {
-      width: 70%;        /* 先佔滿父層 */
-      max-width: 650px;   /* 最大寬度 */
-      /* 移除 margin: auto，因為由 body 的 flexbox 處理置中 */
-      margin-top: 3rem; /* 保持頂部邊距 */
-      margin-bottom: 3rem; /* 保持底部邊距 */
-      padding: 50px;
-      background-color: #ffffff;
-      border-radius: 15px;
-      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
-      border: 2px solid #4e167d; /* 新增邊框，讓容器邊界更明顯 */
-    }
+.container {
+  display: block; /* 確保是塊級元素，以便 margin: auto 生效 */
+  width: 100%;        /* 先佔滿父層 */
+  max-width: 550px;   /* 最大寬度 */
+  margin: 3rem auto;  /* 重新啟用 margin: auto 進行水平置中 */
+  padding: 50px;
+  background-color: #ffffff;
+  border-radius: 15px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+  border: 2px solid #4e167d; /* 新增邊框，讓容器邊界更明顯 */
+}}
     .header {
       text-align: center;
       margin-bottom: 2rem;
