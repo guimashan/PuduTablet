@@ -10,26 +10,22 @@
     /* 自訂 CSS 樣式 */
     body {
       font-family: 'Inter', sans-serif;
-      background-color: #f6deb9; /* 淺黃色背景 */
+      background-color: #f6deb9;
       color: #333;
-      /* 使用 Flexbox 進行水平置中，並確保內容從頂部開始 */
+     
       display: flex;
-      justify-content: center; /* 水平居中 */
-      /* align-items: flex-start; /* 內容從頂部開始對齊 */
-      /* min-height: 100vh; /* 確保 body 至少佔滿一個視窗的高度 */
+      justify-content: center; 
+
     }
     .container {
       background-color: #ffffff;
       padding: 50px;
       border-radius: 15px;
       box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);    
-      width: 60%;        /* 先佔滿父層 (body) */
-      min-width: 400px;   /* 最小寬度 */      
-      max-width: 600px;   /* 最大寬度 */
-      /* 垂直方向的邊距，水平置中由 body 的 flexbox 處理 */
-      /* margin-top: 3rem; */
-      /* margin-bottom: 3rem; */
-      border: 2px solid #4e167d; /* 新增邊框，讓容器邊界更明顯 */
+      width: 60%;        
+      min-width: 400px;      
+      max-width: 600px; 
+      border: 2px solid #4e167d; 
     }
     .header {
       text-align: center;
@@ -54,12 +50,12 @@
     }
     .input-field:focus {
       outline: none;
-      border-color: #4299e1; /* 藍色邊框 */
+      border-color: #4299e1;
       box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.5);
     }
     .button {
       padding: 0.75rem 1.5rem;
-      background-color: #4299e1; /* 藍色按鈕 */
+      background-color: #4299e1;
       color: white;
       border: none;
       border-radius: 8px;
@@ -68,14 +64,14 @@
       transition: background-color 0.2s, transform 0.1s;
     }
     .button:hover {
-      background-color: #3182ce; /* 深藍色 */
+      background-color: #3182ce; 
       transform: translateY(-1px);
     }
     .button:active {
       transform: translateY(0);
     }
     .table-container {
-      overflow-x: auto; /* 確保表格在小螢幕上可捲動 */
+      overflow-x: auto;
     }
     .data-table {
       width: 100%;
@@ -93,10 +89,10 @@
       color: #4a5568;
     }
     .data-table tr:nth-child(even) {
-      background-color: #f7fafc; /* 斑馬紋效果 */
+      background-color: #f7fafc;
     }
     .data-table tr:hover {
-      background-color: #ebf8ff; /* 懸停效果 */
+      background-color: #ebf8ff;
     }
     .loading-spinner {
       border: 4px solid rgba(0, 0, 0, 0.1);
@@ -105,7 +101,7 @@
       width: 24px;
       height: 24px;
       animation: spin 1s linear infinite;
-      display: none; /* 預設隱藏 */
+      display: none; 
       margin-left: 0.5rem;
     }
     @keyframes spin {
@@ -119,7 +115,7 @@
       padding: 1rem;
       border-radius: 8px;
       margin-top: 1rem;
-      display: none; /* 預設隱藏 */
+      display: none; 
     }
   </style>
 </head>
@@ -133,7 +129,7 @@
 <div class="mb-8 p-6 rounded-lg shadow-inner" style="background-color: #ded3e8;">
   <h2 class="section-title text-purple-900">法會牌位統計表</h2>
   <div id="plaque-statistics" class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-lg text-gray-800">
-    <!-- 統計資料將由 JavaScript 動態載入 -->
+
     <div class="flex justify-between items-center bg-gray-50 p-3 rounded-md shadow-sm">
       <span class="inline-block w-28">超拔祖先：</span>
       <span id="stat-ancestor" class="text-xl">載入中...</span>
@@ -153,7 +149,7 @@
   </div>
 </div>
 
-    <!-- 姓名查詢區塊 -->
+
     <div class="mb-8 p-6 bg-gray-50 rounded-lg shadow-inner">
       <h2 class="section-title text-gray-800">牌位查詢</h2>
       <div class="flex flex-col sm:flex-row gap-4 items-center">
@@ -166,7 +162,7 @@
       <div id="messageBox" class="message-box mt-4"></div>
     </div>
 
-    <!-- 查詢結果區塊 -->
+
     <div id="resultsContainer" class="table-container p-6 bg-gray-50 rounded-lg shadow-inner hidden">
       <h2 class="section-title text-gray-800">查詢結果</h2>
       <table id="plaqueResults" class="data-table">
@@ -178,17 +174,17 @@
           </tr>
         </thead>
         <tbody>
-          <!-- 查詢結果將由 JavaScript 動態載入 -->
+
         </tbody>
       </table>
     </div>
   </div>
 
   <script>
-    // ** 重要：請將此處替換為您部署 Apps Script Web App 後獲得的 URL **
+
     const APPS_SCRIPT_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwB-znjC8UqolwuK8ns976sp1yGKjX0clGsUn4ALPMrVeKrA69gqzUMJaQdHjrQsxif/exec'; 
 
-    // 當網頁載入完成時執行
+
     document.addEventListener('DOMContentLoaded', function() {
       const nameInput = document.getElementById('nameInput');
       const searchButton = document.getElementById('searchButton');
@@ -197,10 +193,10 @@
       const plaqueResultsBody = document.querySelector('#plaqueResults tbody');
       const messageBox = document.getElementById('messageBox');
 
-      // 載入牌位統計資料
+
       loadPlaqueStatistics();
 
-      // 查詢按鈕點擊事件
+
       searchButton.addEventListener('click', searchPlaques);
       // 輸入框按下 Enter 鍵時也觸發查詢
       nameInput.addEventListener('keypress', function(e) {
@@ -209,55 +205,48 @@
         }
       });
 
-      /**
-       * 顯示訊息框
-       * @param {string} message - 要顯示的訊息
-       * @param {string} type - 訊息類型 (例如: 'success', 'error', 'warning')
-       */
+
       function showMessage(message, type = 'info') {
         messageBox.textContent = message;
-        messageBox.className = 'message-box mt-4'; // 重置樣式
+        messageBox.className = 'message-box mt-4'; 
         if (type === 'error') {
           messageBox.classList.add('bg-red-100', 'border-red-400', 'text-red-700');
         } else if (type === 'success') {
           messageBox.classList.add('bg-green-100', 'border-green-400', 'text-green-700');
-        } else { // info 或其他
+        } else { 
           messageBox.classList.add('bg-blue-100', 'border-blue-400', 'text-blue-700');
         }
         messageBox.style.display = 'block';
       }
 
-      /**
-       * 隱藏訊息框
-       */
+      
       function hideMessageBox() {
         messageBox.style.display = 'none';
       }
 
-      /**
-       * 載入牌位統計資料並顯示在網頁上。
-       */
+  
       async function loadPlaqueStatistics() {
         try {
-          // 使用 fetch API 呼叫 Apps Script Web App
+
           const response = await fetch(`${APPS_SCRIPT_WEB_APP_URL}?action=getStatistics`);
           
           if (!response.ok) {
             throw new Error(`HTTP 錯誤！狀態碼: ${response.status}`);
           }
-          const stats = await response.json(); // 解析 JSON 回應
+          const stats = await response.json();
           
-          if (stats.error) { // 檢查 Apps Script 後端是否返回錯誤
+          if (stats.error) { 
             throw new Error(stats.error);
           }
 
-          // 成功取得資料後更新網頁元素
+
           document.getElementById('stat-ancestor').innerHTML = `${stats['超拔祖先']}<span style="color: #4e167d;">份</span> 牌位`;
           document.getElementById('stat-debtor').innerHTML = `${stats['冤親債主']}<span style="color: #4e167d;">份</span> 牌位`;
           document.getElementById('stat-land').innerHTML = `${stats['地基主']}<span style="color: #4e167d;">份</span> 牌位`;
           document.getElementById('stat-infant').innerHTML = `${stats['超拔嬰靈']}<span style="color: #4e167d;">份</span> 牌位`;
         } catch (error) {
-          // 處理錯誤
+
+          
           console.error('載入牌位統計資料失敗：', error.message);
           showMessage('載入牌位統計資料失敗，請稍後再試。', 'error');
           document.getElementById('stat-ancestor').innerHTML = `載入失敗`;
@@ -267,74 +256,69 @@
         }
       }
 
-      /**
-       * 執行姓名牌位查詢。
-       */
+
       async function searchPlaques() {
         const name = nameInput.value.trim();
         if (!name) {
           showMessage('請輸入姓名進行查詢。', 'warning');
-          resultsContainer.classList.add('hidden'); // 隱藏結果區塊
+          resultsContainer.classList.add('hidden'); 
           return;
         }
 
-        hideMessageBox(); // 隱藏之前的訊息
-        plaqueResultsBody.innerHTML = ''; // 清空之前的查詢結果
-        resultsContainer.classList.add('hidden'); // 預設隱藏結果區塊
-        searchButton.disabled = true; // 禁用按鈕
-        searchSpinner.style.display = 'block'; // 顯示載入動畫
+        hideMessageBox(); 
+        plaqueResultsBody.innerHTML = ''; 
+        resultsContainer.classList.add('hidden'); 
+        searchButton.disabled = true; 
+        searchSpinner.style.display = 'block'; 
 
         try {
-          // 使用 fetch API 呼叫 Apps Script Web App
+       
           const response = await fetch(`${APPS_SCRIPT_WEB_APP_URL}?action=searchPlaques&name=${encodeURIComponent(name)}`);
           
           if (!response.ok) {
             throw new Error(`HTTP 錯誤！狀態碼: ${response.status}`);
           }
-          const results = await response.json(); // 解析 JSON 回應
+          const results = await response.json(); 
 
-          if (results.error) { // 檢查 Apps Script 後端是否返回錯誤
+          if (results.error) {
             throw new Error(results.error);
           }
 
-          searchButton.disabled = false; // 啟用按鈕
-          searchSpinner.style.display = 'none'; // 隱藏載入動畫
+          searchButton.disabled = false; 
+          searchSpinner.style.display = 'none'; 
 
           if (results.length > 0) {
             displayResults(results);
-            resultsContainer.classList.remove('hidden'); // 顯示結果區塊
+            resultsContainer.classList.remove('hidden'); 
             showMessage(`找到 ${results.length} 筆相關資料。`, 'success');
           } else {
             showMessage(`找不到姓名為「${name}」的牌位資料。`, 'info');
-            resultsContainer.classList.add('hidden'); // 隱藏結果區塊
+            resultsContainer.classList.add('hidden');
           }
         } catch (error) {
-          searchButton.disabled = false; // 啟用按鈕
-          searchSpinner.style.display = 'none'; // 隱藏載入動畫
+          searchButton.disabled = false; 
+          searchSpinner.style.display = 'none'; 
           console.error('查詢牌位資料失敗：', error.message);
           showMessage('查詢牌位資料失敗，請稍後再試。', 'error');
-          resultsContainer.classList.add('hidden'); // 隱藏結果區塊
+          resultsContainer.classList.add('hidden'); 
         }
       }
 
-      /**
-       * 將查詢結果顯示在表格中，並處理姓名只顯示一次的邏輯。
-       * @param {Array<Object>} results - 查詢到的牌位資料陣列
-       */
+   
       function displayResults(results) {
-        let lastDisplayedName = null; // 用於追蹤上一個顯示的姓名
+        let lastDisplayedName = null; 
         results.forEach(item => {
-          const row = plaqueResultsBody.insertRow(); // 插入新行
+          const row = plaqueResultsBody.insertRow(); 
           const nameCell = row.insertCell(0);
           const plaqueNumberCell = row.insertCell(1);
           const plaqueTypeCell = row.insertCell(2);
 
-          // 判斷姓名是否重複，重複則留空
+         
           if (item.name !== lastDisplayedName) {
             nameCell.textContent = item.name;
             lastDisplayedName = item.name;
           } else {
-            nameCell.textContent = ''; // 如果姓名重複，則姓名欄位留空
+            nameCell.textContent = ''; 
           }
 
           plaqueNumberCell.textContent = item.plaqueNumber;
