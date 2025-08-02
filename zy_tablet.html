@@ -7,7 +7,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     :root {
-      --primary-color: #4e167d; /* 紫色邊框 */
+      --primary-color: #4e167d; /* 紫色邊框和文字 */
     }
     * {
       box-sizing: border-box; /* 確保 padding 和 border 不影響寬度 */
@@ -43,6 +43,10 @@
       margin-bottom: 1.5rem;
       color: var(--primary-color);
     }
+    #year-title {
+      color: #000000; /* 年份標題為黑色 */
+      font-weight: normal; /* 移除粗體 */
+    }
     .section-title {
       font-size: 1.25rem;
       font-weight: bold;
@@ -50,6 +54,9 @@
       color: #333;
       border-bottom: 2px solid #e2e8f0;
       padding-bottom: 0.5rem;
+    }
+    .stats-box .section-title {
+      color: var(--primary-color); /* 法會牌位統計表標題為紫色 */
     }
     .input-field {
       padding: 0.5rem;
@@ -138,7 +145,7 @@
 <body>
   <div class="container">
     <h1 class="header text-2xl font-bold">龜馬山紫皇天乙真慶宮</h1>
-    <h2 class="header text-xl font-bold" id="year-title"></h2>
+    <h2 class="header text-xl" id="year-title">2024年中元法會牌位查詢（測試）</h2>
 
     <!-- 統計區域 -->
     <div class="stats-box">
@@ -206,8 +213,8 @@
     const resultsContainer = document.getElementById('resultsContainer');
     const plaqueResultsBody = document.querySelector('#plaqueResults tbody');
 
-    // 動態設置年份
-    document.getElementById('year-title').textContent = `${new Date().getFullYear()}年中元法會牌位查詢（測試:2024年）`;
+    // 設置年份標題（硬編碼為 2024）
+    document.getElementById('year-title').textContent = '2024年中元法會牌位查詢（測試）';
 
     // 轉義 HTML 防止 XSS
     function escapeHTML(str) {
