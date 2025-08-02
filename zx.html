@@ -35,7 +35,7 @@
     /* 電腦（螢幕寬度 ≥ 640px）固定 550px */
     @media (min-width: 640px) {
       .container {
-        width: 600px !important; /* 固定寬度，防止覆蓋 */
+        width: 550px !important; /* 固定寬度，防止覆蓋 */
       }
     }
     .header {
@@ -137,9 +137,8 @@
 </head>
 <body>
   <div class="container">
-    <h1 class="header text-2xl font-bold"> 龜馬山紫皇天乙真慶宮</h1>
-    <h2 class="header text-xl font-bold" > 2024年中元法會牌位（測試）</h2>
-    <!--id="year-title"-->
+    <h1 class="header text-2xl font-bold">龜馬山紫皇天乙真慶宮</h1>
+    <h2 class="header text-xl font-bold" id="year-title"></h2>
 
     <!-- 統計區域 -->
     <div class="stats-box">
@@ -207,8 +206,8 @@
     const resultsContainer = document.getElementById('resultsContainer');
     const plaqueResultsBody = document.querySelector('#plaqueResults tbody');
 
-    <!--// 動態設置年份
-    document.getElementById('year-title').textContent = `${new Date().getFullYear()}年中元法會牌位查詢`; -->
+    // 動態設置年份
+    document.getElementById('year-title').textContent = `${new Date().getFullYear()}年中元法會牌位查詢（測試:2024年）`;
 
     // 轉義 HTML 防止 XSS
     function escapeHTML(str) {
