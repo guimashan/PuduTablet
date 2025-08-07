@@ -13,7 +13,11 @@
       box-sizing: border-box; /* 確保 padding 和 border 不影響寬度 */
     }
     body {
-      background-color: #f6deb9; /* 背景色 */
+      background-image: url('https://www.guimashan.org.tw/images/body-bg.jpg'); /* 背景圖片 */
+      background-size: cover; /* 圖片覆蓋整個頁面 */
+      background-position: center; /* 圖片居中 */
+      background-repeat: no-repeat; /* 不重複平鋪 */
+      background-attachment: fixed; /* 固定背景，滾動時不動（手機可能不支援） */
       display: flex;
       justify-content: center; /* 水平置中 */
       align-items: center; /* 垂直置中 */
@@ -26,11 +30,11 @@
       width: 100%; /* 手機預設全寬 */
       margin-left: auto; /* 左右置中 */
       margin-right: auto;
-      background-color: #ffffff; /* 白色方框 */
+      background-color: #ffffff; /* 白色方框（不透明） */
       padding: 2rem;
       border-radius: 15px;
       border: 2px solid var(--primary-color);
-      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15); /* 陰影增強可見性 */
     }
     /* 電腦（螢幕寬度 ≥ 640px）固定 550px */
     @media (min-width: 640px) {
