@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>龜馬山紫皇天乙真慶宮 中元法會牌位查詢</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root {
+      --primary-color: #4e167d;
+    }
+    body {
+      background-image: url('https://www.guimashan.org.tw/images/body-bg.jpg');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+    .container {
+      width: 100%;
+      margin: auto;
+      background-color: #ffffff;
+      padding: 2rem;
+      border-radius: 15px;
+      border: 2px solid var(--primary-color);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+    }
+    @media (min-width: 640px) {
+      .container { width: 550px !important; }
+    }
+    .header { text-align: center; margin-bottom: 1.5rem; color: var(--primary-color); }
+    #year-title { color: #000; font-weight: normal; }
+    .section-title {
+      font-size: 1.25rem; font-weight: bold; margin-bottom: 1rem;
+      color: #333; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.5rem;
+    }
+    .stats-box .section-title { color: var(--primary-color); }
+    .input-field {
+      padding: 0.5rem; border: 1px solid #ccc; border-radius: 8px;
+      width: 100%; font-size: 1rem;
+    }
+    .button {
+      padding: 0.5rem 1rem; background-color: #4299e1; color: white;
+      border: none; border-radius: 8px; cursor: pointer; font-size: 1rem;
+    }
+    .button:hover { background-color: #3182ce; }
+    .button:disabled { background-color: #a0aec0; cursor: not-allowed; }
+    .loading-spinner {
+      border: 4px solid rgba(0, 0, 0, 0.1); border-left-color: #4299e1;
+      border-radius: 50%; width: 20px; height: 20px;
+      animation: spin 1s linear infinite; display: none; margin-left: 0.5rem;
+    }
+    @keyframes spin { 0% { transform: rotate(0deg);} 100% { transform: rotate(360deg);} }
+    .message-box {
+      padding: 0.75rem; border-radius: 8px; margin-top: 1rem; display: none;
+    }
+    .message-box.info { background: #e6f3ff; border: 1px solid #4299e1; color: #1a4971; }
+    .message-box.error { background: #ffe6e6; border: 1px solid #f87171; color: #991b1b; }
+    .message-box.success { background: #d1fae5; border: 1px solid #34d399; color: #065f46; }
+    .stats-box { background: #ded3e8; padding: 1.5rem; border-radius: 8px; margin-bottom: 1.5rem; }
+    .data-table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+    .data-table th, .data-table td {
+      border: 1px solid #e2e8f0; padding: 0.5rem; text-align: left; font-size: 0.9rem;
+    }
+    .data-table th { background: #edf2f7; font-weight: bold; }
+    .data-table tr:nth-child(even) { background: #f7fafc; }
+    .data-table tr:hover { background: #e9d8fd; } /* hover 效果 */
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 class="header text-2xl font-bold">龜馬山紫皇天乙真慶宮</h1>
+    <h2 class="header text-xl" id="year-title">2025年中元法會牌位查詢（更新中）</h2>
+
+    <!-- 統計區域 -->
+    <div class="stats-box">
+      <h2 class="section-title">法會牌位統計表</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="flex justify-between p-2 bg-gray-100 rounded">
+          <span>超拔祖先：</span><span id="stat-ancestor">載入中...</span>
+        </div>
+        <div class="flex justify-between p-2 bg-gray-100 rounded">
+          <span>冤親債主：</span><span id="stat-debtor">載入中...</span>
+        </div>
+        <div class="flex justify-between p-2 bg-gray-100 rounded">
+          <span>地基主：</span><span id="stat-land">載入中...</span>
+        </div>
+        <div class="flex justify-between p-2 bg-gray-100 rounded">
+          <span>超拔嬰靈：</span><span id="stat-infant">載入中...</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 查詢區域 -->
+    <div class="p-4 bg-gray-100 rounded">
+      <h2 class="section-title">牌位查詢</h2>
+      <div class="flex gap-2 items-center">
+        <input type="text" id="nameInput" placeholder="請輸入姓名或公司" class="input-field" aria-label="輸入姓名或公司名稱">
+        <button id="searchButton" class="button flex items-center">
+          查詢
+          <div id="searchSpinner" class="loading-spinner"></div>
+        </button>
+      </div>
+      <div id="messageBox" class="message-box" role="alert" aria-live="polite"></div>
+    </div>
+
+    <!-- 查詢結果 -->
+    <div id="resultsContainer" class="p-4 bg-gray-100 rounded hidden">
+      <h2 class="section-title">查詢結果</h2>
+      <div style="overflow-x: auto;">
+        <table id="plaqueResults" class="data-table">
+          <thead>
+            <tr>
+              <th>姓名</th><th>牌位號</th><th>牌位種類</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_URL = 'https://script.google.com/macros/s/AKfycbwB-znjC8UqolwuK8ns976sp1yGKjX0clGsUn4ALPMrVeKrA69gqzUMJaQdHjrQsxif/exec';
+    const CACHE_TTL = 10 * 60 * 1000; // 10 分鐘快取
+    const nameInput = document.getElementById('nameInput');
+    const searchButton = document.getElementById('searchButton');
+    const searchSpinner = document.getElementById('searchSpinner');
+    const messageBox = document.getElementById('messageBox');
+    const resultsContainer = document.getElementById('resultsContainer');
+    const plaqueResultsBody = document.querySelector('#plaqueResults tbody');
+
+    function escapeHTML(str) {
+      return str.replace(/[&<>"']/g, (m) => ({
+        '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&apos;'
+      })[m]);
+    }
+    function showMessage(msg, type='info') {
+      messageBox.textContent = msg;
+      messageBox.className = `message-box ${type}`;
+      messageBox.style.display = 'block';
+    }
+    function hideMessage(){ messageBox.style.display = 'none'; }
+
+    async function loadStats() {
+      const cached = localStorage.getItem('plaqueStats');
+      const cachedTime = localStorage.getItem('plaqueStatsTime');
+      if (cached && cachedTime && Date.now() - cachedTime < CACHE_TTL) {
+        updateStats(JSON.parse(cached));
+        return;
+      }
+      try {
+        const res = await fetch(`${API_URL}?action=getStatistics`);
+        if (!res.ok) throw new Error(`伺服器錯誤：${res.status}`);
+        const stats = await res.json();
+        if (stats.error) throw new Error(stats.error);
+        localStorage.setItem('plaqueStats', JSON.stringify(stats));
+        localStorage.setItem('plaqueStatsTime', Date.now());
+        updateStats(stats);
+      } catch (err) {
+        showMessage(`載入統計失敗：${err.message}`,'error');
+        ['stat-ancestor','stat-debtor','stat-land','stat-infant']
+          .forEach(id=>{document.getElementById(id).textContent='載入失敗';});
+      }
+    }
+    function updateStats(stats){
+      document.getElementById('stat-ancestor').innerHTML = `${escapeHTML(stats['超拔祖先'].toString())}<span style="color: var(--primary-color);">份</span>`;
+      document.getElementById('stat-debtor').innerHTML = `${escapeHTML(stats['冤親債主'].toString())}<span style="color: var(--primary-color);">份</span>`;
+      document.getElementById('stat-land').innerHTML = `${escapeHTML(stats['地基主'].toString())}<span style="color: var(--primary-color);">份</span>`;
+      document.getElementById('stat-infant').innerHTML = `${escapeHTML(stats['超拔嬰靈'].toString())}<span style="color: var(--primary-color);">份</span>`;
+    }
+
+    async function searchPlaques() {
+      const name = nameInput.value.trim();
+      if (!name){
+        showMessage('請輸入姓名或公司','info');
+        resultsContainer.classList.add('hidden'); return;
+      }
+      if (name.length > 50 || /[<>{}]/.test(name)){
+        showMessage('請輸入有效姓名（最多50字，不含特殊字符）','info');
+        resultsContainer.classList.add('hidden'); return;
+      }
+      showMessage('查詢中，請稍候...','info');
+      plaqueResultsBody.innerHTML = '';
+      resultsContainer.classList.add('hidden');
+      searchButton.disabled = true;
+      searchSpinner.style.display = 'block';
+      try {
+        const res = await fetch(`${API_URL}?action=searchPlaques&name=${encodeURIComponent(name)}`);
+        if (!res.ok) throw new Error(`伺服器錯誤：${res.status}`);
+        const results = await res.json();
+        if (results.error) throw new Error(results.error);
+        if (results.length>0){
+          displayResults(results);
+          resultsContainer.classList.remove('hidden');
+          showMessage(`找到 ${results.length} 筆資料`,'success');
+        } else {
+          showMessage(`無「${escapeHTML(name)}」的牌位資料`,'info');
+        }
+      } catch(err){
+        showMessage(err.message.includes('NetworkError') ? '網路連線失敗，請檢查網路' : `查詢失敗：${err.message}`,'error');
+      } finally {
+        searchButton.disabled = false;
+        searchSpinner.style.display = 'none';
+      }
+    }
+    function displayResults(results){
+      const frag = document.createDocumentFragment();
+      let lastName = null;
+      results.forEach(item=>{
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${item.name!==lastName ? escapeHTML(item.name):''}</td>
+          <td>${escapeHTML(item.plaqueNumber)}</td>
+          <td>${escapeHTML(item.plaqueType)}</td>`;
+        frag.appendChild(row);
+        lastName=item.name;
+      });
+      plaqueResultsBody.appendChild(frag);
+    }
+
+    let debounceTimeout;
+    function debounceSearch(){
+      clearTimeout(debounceTimeout);
+      debounceTimeout = setTimeout(searchPlaques,300);
+    }
+    searchButton.addEventListener('click',debounceSearch);
+    nameInput.addEventListener('keypress',e=>{if(e.key==='Enter')debounceSearch();});
+    loadStats();
+  </script>
+</body>
+</html>
