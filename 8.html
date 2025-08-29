@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>龜馬山紫皇天乙真慶宮 中元法會牌位查詢</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root {
+      --primary-color: #4e167d;
+    }
+    body {
+      background-image: url('https://www.guimashan.org.tw/images/body-bg.jpg');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      font-family: Arial, sans-serif;
+      padding: 1rem;
+    }
+    .container {
+      width: 100%;
+      margin: auto;
+      background-color: #ffffff;
+      padding: 2rem;
+      border-radius: 15px;
+      border: 2px solid var(--primary-color);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+    }
+    @media (min-width: 640px) {
+      .container { width: 550px !important; }
+    }
+    .header { text-align: center; margin-bottom: 1.5rem; color: var(--primary-color); }
+    #year-title { color: #000000; font-weight: normal; margin-top: -1rem; margin-bottom: 1rem;}
+    .section-title {
+      font-size: 1.25rem; font-weight: bold; margin-bottom: 1rem;
+      color: #333; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.5rem;
+    }
+    .input-field {
+      padding: 0.5rem; border: 1px solid #ccc; border-radius: 8px;
+      width: 100%; font-size: 1rem;
+    }
+    .button {
+      padding: 0.5rem 1rem; background-color: #4299e1; color: white;
+      border: none; border-radius: 8px; cursor: pointer; font-size: 1rem;
+      transition: background-color 0.2s;
+    }
+    .button:hover { background-color: #3182ce; }
+    .button:disabled { background-color: #a0aec0; cursor: not-allowed; }
+    .loading-spinner {
+      border: 4px solid rgba(0, 0, 0, 0.1); border-left-color: #4299e1;
+      border-radius: 50%; width: 20px; height: 20px;
+      animation: spin 1s linear infinite; display: none; margin-left: 0.5rem;
+    }
+    @keyframes spin { 0% { transform: rotate(0deg);} 100% { transform: rotate(360deg);} }
+    .message-box { padding: 0.75rem; border-radius: 8px; margin-top: 1rem; display: none; }
+    .message-box.info { background-color: #e6f3ff; border: 1px solid #4299e1; color: #1a4971; }
+    .message-box.error { background-color: #ffe6e6; border: 1px solid #f87171; color: #991b1b; }
+    .message-box.success { background-color: #d1fae5; border: 1px solid #34d399; color: #065f46; }
+    .data-table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+    .data-table th, .data-table td {
+      border: 1px solid #e2e8f0; padding: 0.5rem; text-align: left; font-size: 0.9rem;
+    }
+    .data-table th { background-color: #edf2f7; font-weight: bold; }
+    .data-table tr:nth-child(even) { background-color: #f7fafc; }
+    .data-table tr:hover { background-color: #e6f0ff; }
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border-width: 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 class="header text-2xl font-bold">龜馬山紫皇天乙真慶宮</h1>
+    <h2 class="header text-xl" id="year-title">2025年中元法會牌位查詢</h2>
+
+    <div class="text-center mb-6">
+      <img src="https://www.guimashan.org.tw/images/guimashan_logo_h01.png" alt="龜馬山 Logo" class="mx-auto w-1/2 md:w-1/3">
+    </div>
+
+    <div class="p-4 bg-gray-100 rounded">
+      <h2 class="section-title">牌位查詢</h2>
+      <div class="flex gap-2 items-center">
+        <label for="nameInput" class="sr-only">姓名或公司名稱</label>
+        <input type="text" id="nameInput" placeholder="請輸入姓名或公司" class="input-field">
+        <button id="searchButton" class="button flex items-center">
+          查詢 <div id="searchSpinner" class="loading-spinner"></div>
+        </button>
+      </div>
+      <div id="messageBox" class="message-box"></div>
+    </div>
+
+    <div id="resultsContainer" class="mt-4 hidden">
+      <h2 class="section-title">查詢結果</h2>
+      <div class="p-4 bg-gray-100 rounded" style="overflow-x: auto;">
+        <table id="plaqueResults" class="data-table">
+          <thead>
+            <tr><th>姓名</th><th>牌位號</th><th>牌位種類</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_URL = 'https://script.google.com/macros/s/AKfycbwB-znjC8UqolwuK8ns976sp1yGKjX0clGsUn4ALPMrVeKrA69gqzUMJaQdHjrQsxif/exec';
+    const nameInput = document.getElementById('nameInput');
+    const searchButton = document.getElementById('searchButton');
+    const searchSpinner = document.getElementById('searchSpinner');
+    const messageBox = document.getElementById('messageBox');
+    const resultsContainer = document.getElementById('resultsContainer');
+    const plaqueResultsBody = document.querySelector('#plaqueResults tbody');
+    let debounceTimeout;
+
+    document.getElementById('year-title').textContent = `${new Date().getFullYear()}年中元法會牌位查詢`;
+
+    function escapeHTML(str) {
+      return str.toString().replace(/[&<>"']/g, (m) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+    }
+
+    function showMessage(message, type = 'info') {
+      messageBox.textContent = message;
+      messageBox.className = `message-box ${type}`;
+      messageBox.style.display = 'block';
+    }
+
+    function hideMessage() {
+      messageBox.style.display = 'none';
+    }
+
+    async function searchPlaques() {
+      const name = nameInput.value.trim();
+      if (!name) {
+        showMessage('請輸入姓名或公司名稱進行查詢', 'info');
+        resultsContainer.classList.add('hidden');
+        return;
+      }
+      if (name.length > 50 || /[<>{}]/.test(name)) {
+        showMessage('請輸入有效的查詢名稱（最多50字，不含特殊符號）', 'info');
+        return;
+      }
+
+      hideMessage();
+      plaqueResultsBody.innerHTML = '';
+      resultsContainer.classList.add('hidden');
+      searchButton.disabled = true;
+      searchSpinner.style.display = 'inline-block';
+
+      try {
+        const response = await fetch(`${API_URL}?action=searchPlaques&name=${encodeURIComponent(name)}`);
+        if (!response.ok) throw new Error(`伺服器錯誤：${response.status}`);
+        const results = await response.json();
+        if (results.error) throw new Error(results.error);
+
+        if (results.length > 0) {
+          displayResults(results);
+          resultsContainer.classList.remove('hidden');
+          showMessage(`查詢「${escapeHTML(name)}」成功，找到 ${results.length} 筆資料`, 'success');
+        } else {
+          showMessage(`查無「${escapeHTML(name)}」的相關牌位資料`, 'info');
+        }
+      } catch (error) {
+        const isNetworkError = error.message.includes('Failed to fetch');
+        showMessage(isNetworkError ? '網路連線失敗，請檢查您的網路連線' : `查詢失敗：${error.message}`, 'error');
+      } finally {
+        searchButton.disabled = false;
+        searchSpinner.style.display = 'none';
+      }
+    }
+
+    function displayResults(results) {
+      const fragment = document.createDocumentFragment();
+      let lastDisplayedName = null;
+      results.forEach(item => {
+        const row = document.createElement('tr');
+        // Only show the name in the first row for that name to avoid repetition
+        const displayName = item.name !== lastDisplayedName ? escapeHTML(item.name) : '';
+        row.innerHTML = `<td>${displayName}</td>
+                         <td>${escapeHTML(item.plaqueNumber)}</td>
+                         <td>${escapeHTML(item.plaqueType)}</td>`;
+        fragment.appendChild(row);
+        lastDisplayedName = item.name;
+      });
+      plaqueResultsBody.appendChild(fragment);
+    }
+
+    // Event Listeners
+    searchButton.addEventListener('click', searchPlaques);
+
+    nameInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        clearTimeout(debounceTimeout); // Cancel any pending auto-search
+        searchPlaques();
+      }
+    });
+
+    nameInput.addEventListener('input', () => {
+      clearTimeout(debounceTimeout);
+      debounceTimeout = setTimeout(() => {
+        searchPlaques();
+      }, 500); // 500ms delay
+    });
+
+  </script>
+</body>
+</html>
