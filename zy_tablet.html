@@ -103,7 +103,8 @@
       <div class="p-4 bg-gray-100 rounded" style="overflow-x: auto;">
         <table id="plaqueResults" class="data-table">
           <thead>
-            <tr><th>姓名</th><th>牌位號</th><th>牌位種類</th></tr>
+            <!-- 👈 這裡調整了表格標題，加入了「區域」 -->
+            <tr><th>姓名</th><th>牌位號</th><th>牌位種類</th><th>區域</th></tr>
           </thead>
           <tbody></tbody>
         </table>
@@ -128,9 +129,8 @@
     const messageBox = document.getElementById('messageBox');
     const resultsContainer = document.getElementById('resultsContainer');
     const plaqueResultsBody = document.querySelector('#plaqueResults tbody');
-    let isSearching = false; // 防重複查詢的安全鎖
+    let isSearching = false; 
 
-    // 動態設定標題年份為當前年份
     document.getElementById('year-title').textContent = `${new Date().getFullYear()}年中元法會牌位查詢`;
 
     function escapeHTML(str) {
@@ -147,7 +147,6 @@
       messageBox.style.display = 'none';
     }
 
-    // 核心查詢邏輯
     async function searchPlaques() {
       const name = nameInput.value.trim();
       if (!name) {
@@ -188,12 +187,10 @@
       }
     }
 
-    // 包裝函式：防止快速重複點擊或非同步時間差導致重複顯示
     async function safeSearchPlaques() {
       if (isSearching) return; 
       isSearching = true;
       
-      // 發送前強制清空與隱藏舊畫面
       plaqueResultsBody.innerHTML = '';
       resultsContainer.classList.add('hidden');
       
@@ -207,16 +204,17 @@
       results.forEach(item => {
         const row = document.createElement('tr');
         const displayName = item.name !== lastDisplayedName ? escapeHTML(item.name) : '';
+        // 👈 這裡調整了印出結果的 HTML，把新拿到的區域（item.area）塞進最後一格
         row.innerHTML = `<td>${displayName}</td>
                          <td>${escapeHTML(item.plaqueNumber)}</td>
-                         <td>${escapeHTML(item.plaqueType)}</td>`;
+                         <td>${escapeHTML(item.plaqueType)}</td>
+                         <td>${escapeHTML(item.area || '無')}</td>`;
         fragment.appendChild(row);
         lastDisplayedName = item.name;
       });
       plaqueResultsBody.appendChild(fragment);
     }
 
-    // 事件監聽：只有點擊按鈕或按下 Enter 鍵才會觸發查詢
     searchButton.addEventListener('click', safeSearchPlaques);
 
     nameInput.addEventListener('keypress', (e) => {
