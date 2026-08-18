@@ -128,7 +128,7 @@
     const messageBox = document.getElementById('messageBox');
     const resultsContainer = document.getElementById('resultsContainer');
     const plaqueResultsBody = document.querySelector('#plaqueResults tbody');
-    let debounceTimeout;
+    let isSearching = false; // 防重複查詢的安全鎖
 
     // 動態設定標題年份為當前年份
     document.getElementById('year-title').textContent = `${new Date().getFullYear()}年中元法會牌位查詢`;
@@ -147,6 +147,7 @@
       messageBox.style.display = 'none';
     }
 
+    // 核心查詢邏輯
     async function searchPlaques() {
       const name = nameInput.value.trim();
       if (!name) {
@@ -187,12 +188,24 @@
       }
     }
 
+    // 包裝函式：防止快速重複點擊或非同步時間差導致重複顯示
+    async function safeSearchPlaques() {
+      if (isSearching) return; 
+      isSearching = true;
+      
+      // 發送前強制清空與隱藏舊畫面
+      plaqueResultsBody.innerHTML = '';
+      resultsContainer.classList.add('hidden');
+      
+      await searchPlaques();
+      isSearching = false; 
+    }
+
     function displayResults(results) {
       const fragment = document.createDocumentFragment();
       let lastDisplayedName = null;
       results.forEach(item => {
         const row = document.createElement('tr');
-        // Only show the name in the first row for that name to avoid repetition
         const displayName = item.name !== lastDisplayedName ? escapeHTML(item.name) : '';
         row.innerHTML = `<td>${displayName}</td>
                          <td>${escapeHTML(item.plaqueNumber)}</td>
@@ -203,23 +216,14 @@
       plaqueResultsBody.appendChild(fragment);
     }
 
-    // Event Listeners
-    searchButton.addEventListener('click', searchPlaques);
+    // 事件監聽：只有點擊按鈕或按下 Enter 鍵才會觸發查詢
+    searchButton.addEventListener('click', safeSearchPlaques);
 
     nameInput.addEventListener('keypress', (e) => {
       if (e.key === 'Enter') {
-        clearTimeout(debounceTimeout); // Cancel any pending auto-search
-        searchPlaques();
+        safeSearchPlaques();
       }
     });
-
-    nameInput.addEventListener('input', () => {
-      clearTimeout(debounceTimeout);
-      debounceTimeout = setTimeout(() => {
-        searchPlaques();
-      }, 500); // 500ms delay
-    });
-
   </script>
 </body>
 </html>
