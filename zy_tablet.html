@@ -88,6 +88,12 @@
 
     <div class="p-4 bg-gray-100 rounded mb-6">
       <h2 class="section-title">牌位查詢</h2>
+      
+      <!-- 📢 方案 B：永久紅色公告提示區 -->
+      <div id="noticeBox" class="mb-4 text-red-600 font-bold text-sm bg-red-50 p-3 rounded border border-red-200 leading-relaxed">
+        📢 公告：本年度法會於 8/16 截止報名。8/17 日(含)之後報名之信眾，牌位統一安排於【H區】。
+      </div>
+
       <div class="flex gap-2 items-center">
         <label for="nameInput" class="sr-only">姓名或公司名稱</label>
         <input type="text" id="nameInput" placeholder="請輸入姓名或公司" class="input-field">
@@ -103,7 +109,7 @@
       <div class="p-4 bg-gray-100 rounded" style="overflow-x: auto;">
         <table id="plaqueResults" class="data-table">
           <thead>
-            <!-- 👈 這裡調整了表格標題，加入了「區域」 -->
+            <!-- 📊 表格標題同步加入「區域」 -->
             <tr><th>姓名</th><th>牌位號</th><th>牌位種類</th><th>區域</th></tr>
           </thead>
           <tbody></tbody>
@@ -129,8 +135,9 @@
     const messageBox = document.getElementById('messageBox');
     const resultsContainer = document.getElementById('resultsContainer');
     const plaqueResultsBody = document.querySelector('#plaqueResults tbody');
-    let isSearching = false; 
+    let isSearching = false; // 防重複安全鎖
 
+    // 動態設定標題年份為當前年份
     document.getElementById('year-title').textContent = `${new Date().getFullYear()}年中元法會牌位查詢`;
 
     function escapeHTML(str) {
@@ -147,6 +154,7 @@
       messageBox.style.display = 'none';
     }
 
+    // 發送 API 查詢
     async function searchPlaques() {
       const name = nameInput.value.trim();
       if (!name) {
@@ -167,7 +175,7 @@
 
       try {
         const response = await fetch(`${API_URL}?action=searchPlaques&name=${encodeURIComponent(name)}`);
-        if (!response.ok) throw new Error(`伺服器錯誤：${response.status}`);
+        if (!response.ok) throw new Error(`伺服器錯誤：${status}`);
         const results = await response.json();
         if (results.error) throw new Error(results.error);
 
@@ -187,6 +195,7 @@
       }
     }
 
+    // 安全包裝：阻擋使用者連續狂點，並在發送前強制清空舊資料
     async function safeSearchPlaques() {
       if (isSearching) return; 
       isSearching = true;
@@ -198,23 +207,28 @@
       isSearching = false; 
     }
 
+    // 渲染資料至畫面
     function displayResults(results) {
       const fragment = document.createDocumentFragment();
       let lastDisplayedName = null;
       results.forEach(item => {
         const row = document.createElement('tr');
         const displayName = item.name !== lastDisplayedName ? escapeHTML(item.name) : '';
-        // 👈 這裡調整了印出結果的 HTML，把新拿到的區域（item.area）塞進最後一格
+        
+        // 🚀 方案 A：如果後端傳回的區域欄位為空值，代表是補報名，前端畫面自動代入「H區」
+        const areaDisplay = (item.area && item.area.trim() !== '') ? item.area : 'H區';
+
         row.innerHTML = `<td>${displayName}</td>
                          <td>${escapeHTML(item.plaqueNumber)}</td>
                          <td>${escapeHTML(item.plaqueType)}</td>
-                         <td>${escapeHTML(item.area || '無')}</td>`;
+                         <td>${escapeHTML(areaDisplay)}</td>`;
         fragment.appendChild(row);
         lastDisplayedName = item.name;
       });
       plaqueResultsBody.appendChild(fragment);
     }
 
+    // 事件監聽：僅綁定點擊按鈕與 Enter 鍵才觸發，全面移除自動搜尋
     searchButton.addEventListener('click', safeSearchPlaques);
 
     nameInput.addEventListener('keypress', (e) => {
